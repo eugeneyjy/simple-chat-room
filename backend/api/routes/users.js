@@ -1,6 +1,7 @@
 const router = require('express').Router();
 const bcrypt = require('bcryptjs');
 
+const { generateAuthToken, setAuthCookie, requireAuthentication } = require('../../utils/auth');
 const { createUser, getUserByUsername } = require('../controllers/userController');
 
 exports.router = router;
@@ -56,6 +57,10 @@ router.post('/login', async function(req, res, next) {
             // If it does, check if password entered correctly
             const authenticated = user && await bcrypt.compare(credentials.password, user.password);
             if(authenticated) {
+                // generate authentication token
+                const authToken = generateAuthToken(user._id);
+                // set authentication token in cookies
+                setAuthCookie(res, authToken);
                 res.status(200).send({});
             // Return error when user entered wrong password
             } else {
@@ -69,3 +74,13 @@ router.post('/login', async function(req, res, next) {
         });
     }
 });
+
+// router.get('/:userId/messages', requireAuthentication, async function(req, res, next) {
+//     if(req.user !== req.params.userId) {
+//         res.status(403).json({
+//             error: "Unauthorized to access the specified resource"
+//         });
+//     } else {
+//         res.status(200).send({Success: 'congrats'});
+//     }
+// });
