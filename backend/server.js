@@ -9,6 +9,7 @@ const { connectToMongoose } = require('./utils/mongo');
 
 // Load mongoose models
 const User = require('./api/models/userModel');
+const { Conversation, Message } = require('./api/models/conversationModel');
 
 const api = require('./api/routes');
 

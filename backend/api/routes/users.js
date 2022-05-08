@@ -32,7 +32,7 @@ router.post('/', async function(req, res, next) {
         const user = req.body;
         const newUser = await createUser(user);
         // Successfully created a user
-        res.status(201).json({
+        res.status(201).send({
             id: newUser._id
         });
     } catch(err) {

@@ -24,7 +24,7 @@ exports.requireAuthentication = function(req, res, next) {
 
     try {
         const payload = jwt.verify(authToken, secretKey);
-        req.user = payload.sub;
+        req.userId = payload.sub;
         next();
     } catch(err) {
         res.status(401).json({
