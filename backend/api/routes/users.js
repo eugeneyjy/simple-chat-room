@@ -1,5 +1,6 @@
 const router = require('express').Router();
 const bcrypt = require('bcryptjs');
+const cors = require('cors');
 
 const { generateAuthToken, setAuthCookie, requireAuthentication } = require('../../utils/auth');
 const { createUser, getUserByUsername } = require('../controllers/userController');
@@ -13,6 +14,18 @@ function isCredentialFieldsExist(body) {
         return false;
     }
 }
+
+const corsOption = {
+    origin: 'http://localhost:3000'
+}
+
+const corsCredentialsOption = {
+    origin:'http://localhost:3000',
+    credentials: true
+}
+
+router.options('/login', cors(corsCredentialsOption))
+router.use(cors(corsOption))
 
 router.post('/', async function(req, res, next) {
     try {
@@ -48,7 +61,7 @@ router.post('/', async function(req, res, next) {
     }
 });
 
-router.post('/login', async function(req, res, next) {
+router.post('/login', cors(corsCredentialsOption), async function(req, res, next) {
     const credentials = req.body
     if(isCredentialFieldsExist(credentials)) {
             const user = await getUserByUsername(credentials.username, true);
