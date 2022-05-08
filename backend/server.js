@@ -1,6 +1,7 @@
 const express = require('express');
 const morgan = require('morgan');
 const cookieParser = require('cookie-parser');
+const cors = require('cors');
 
 const dotenv = require('dotenv');
 dotenv.config();
@@ -17,6 +18,11 @@ const port = process.env.PORT || 8000;
 
 app.use(morgan('dev'));
 app.use(cookieParser());
+
+const corsOptions = {
+    origin: 'http://localhost:3000'
+}
+app.use(cors(corsOptions));
 app.use(express.json());
 
 app.use('/', api);
