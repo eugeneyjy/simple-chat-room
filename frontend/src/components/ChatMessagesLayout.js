@@ -3,11 +3,13 @@ import { Box } from "@mui/system";
 import moment from 'moment';
 import { useEffect, useState } from "react";
 import socket from "../utils/socket";
+import ChatMessages from "./ChatMessages";
+import { ThemeProvider } from "@material-ui/styles";
+import { createTheme } from "@material-ui/core/styles";
 
 function ChatMessagesLayout({ userId, chat, setChats }) {
     const [ arrivalMessage, setArrivalMessage ] = useState(null);
-    const [ messages, setMessages ] = useState(null);
-    console.log("==chat", chat);
+    const [ messagesComponent, setMessagesComponent ] = useState(null);
 
     async function sendMsg(e) {
         if(e.key === 'Enter' && !e.shiftKey && e.currentTarget.value) {
@@ -34,7 +36,6 @@ function ChatMessagesLayout({ userId, chat, setChats }) {
                 if(res.status === 200) {
                     const responseBody = await res.json();
                     const receiverId = chat.participantIds.find((pid) => pid !== userId);
-                    console.log("==receiverId", receiverId);
                     const socketMessage = {
                         _id: responseBody._id,
                         chatId: chat._id,
@@ -77,76 +78,173 @@ function ChatMessagesLayout({ userId, chat, setChats }) {
             });
         }
 
+        function updateMessagesComponent(components, msg) {
+            let lastMsgGroup = components[components.length-1];
+            if(lastMsgGroup.props.side === 'right') {
+                if(msg.senderId === userId) {
+                    // let newComponents = [...components];
+                    lastMsgGroup.props.messages.push(msg.text);
+                    return [...components];
+                } else {
+                    console.log("push2");
+                    return [...components, <ChatMessages key={msg._id} side={'left'} messages={[msg.text]}/>];
+                }
+            } else {
+                if(msg.senderId !== userId) {
+                    // let newComponents = [...components];
+                    lastMsgGroup.props.messages.push(msg.text);
+                    return [...components];
+                } else {
+                    console.log("push4");
+                    return [...components, <ChatMessages key={msg._id} side={'right'} messages={[msg.text]}/>];
+                }
+            }
+        }
+
         if(arrivalMessage) {
+            console.log("arrive");
             const message = {
                 _id: arrivalMessage._id,
                 senderId: arrivalMessage.senderId,
                 text: arrivalMessage.text,
                 timeStamp: arrivalMessage.timeStamp
             };
-            console.log("==arrival", arrivalMessage);
             setChats(prev => updateChats(prev, message, arrivalMessage.chatId));
             if(chat.participantIds.includes(message.senderId)) {
-                console.log("==message", message);
-                setMessages(prev => [...prev, message]);
+                console.log("outside");
+                const updatedMessagesComponent = updateMessagesComponent(messagesComponent, message);
+                setMessagesComponent(updatedMessagesComponent);
+                console.log(messagesComponent);
+                let messagesBox = document.getElementById('messages');
+                messagesBox.scrollTop = messagesBox.scrollHeight;
             }
         }
     }, [arrivalMessage, setChats]);
 
     useEffect(() => {
+        function populateMessagesComponent(messages) {
+            let components = [];
+            messages.forEach(message => {
+                if(components.length > 0) {
+                    let lastMsgGroup = components[components.length-1]
+                    if(message.senderId === userId) {
+                        if(lastMsgGroup.props.side === 'right') {
+                            lastMsgGroup.props.messages.push(message.text);
+                        } else {
+                            components.push(
+                                <ChatMessages
+                                    key={message._id}
+                                    side={'right'}
+                                    messages={[message.text]}
+                                />
+                            );
+                        }
+                    } else {
+                        if(lastMsgGroup.props.side === 'left') {
+                            lastMsgGroup.props.messages.push(message.text);
+                        } else {
+                            components.push(
+                                <ChatMessages
+                                    key={message._id}
+                                    side={'left'}
+                                    messages={[message.text]}
+                                />
+                            );
+                        }
+                    }
+                } else {
+                    if(message.sendId === userId) {
+                        components.push(
+                            <ChatMessages
+                                key={message._id}
+                                side={'right'}
+                                messages={[message.text]}
+                            />
+                        );
+                    } else {
+                        components.push(
+                            <ChatMessages
+                                key={message._id}
+                                side={'left'}
+                                messages={[message.text]}
+                            />
+                        );
+                    }
+                }
+            });
+            console.log(components);
+            setMessagesComponent(components);
+        }
+
         if(chat) {
-            setMessages(chat.messages);
+            console.log("populating");
+            populateMessagesComponent(chat.messages);
         }
     }, [chat]);
 
+    useEffect(() => {
+        let messagesBox = document.getElementById('messages');
+        messagesBox.scrollTop = messagesBox.scrollHeight;
+    }, [messagesComponent]);
+
+    const muiBaseTheme = createTheme();
+
     return(
-        <Box
-            sx={{ 
-                bgcolor: 'grey',
-                height: '100%',
-                display: 'flex',
-                flexDirection: 'column'
-            }}
-        >
-            <Paper
-                square
-                elevation={0}
-                variant="outlined"
-                sx={{ p: '12px 10px', display: 'flex', alignItems: 'center' }}
-            >
-                <Avatar alt="Remy Sharp" src="http://placekitten.com/200/300" sx={{ mr: 2 }}/>
-                <Typography variant="h6" color="inherit" component="div">
-                    {chat ? chat.participants.filter(p => p._id !== userId)[0].username : ''}
-                </Typography>
-            </Paper>
+        <ThemeProvider theme={muiBaseTheme}>
             <Box
-                sx={{height: '100%'}}
-            >
-                {messages ? messages.map((message) => (<div key={message._id}>{message.text}</div>)) : ''}
-            </Box>
-            <Paper
-                square
-                elevation={0}
-                variant="outlined"
-                sx={{ p: '10px 10px' }}
+                sx={{ 
+                    bgcolor: 'grey',
+                    height: '100%',
+                    display: 'flex',
+                    flexDirection: 'column'
+                }}
             >
                 <Paper
-                    square={false}
+                    square
+                    elevation={0}
                     variant="outlined"
-                    sx={{ borderRadius: 5, display: 'flex' }}
+                    sx={{ p: '12px 10px', display: 'flex', alignItems: 'center' }}
                 >
-                    <InputBase
-                        sx={{ ml: 1, pr: 2, pl: 2, width: '100%' }}
-                        placeholder="Start new conversation"
-                        inputProps={{ 'aria-label': 'Start new conversation' }}
-                        multiline
-                        maxRows={5}
-                        onKeyUp={(e) => sendMsg(e)}
-                        onKeyDown={(e) => controlNewLine(e)}
-                    />
+                    <Avatar alt="Remy Sharp" src="http://placekitten.com/200/300" sx={{ mr: 2 }}/>
+                    <Typography variant="h6" color="inherit" component="div">
+                        {chat ? chat.participants.filter(p => p._id !== userId)[0].username : ''}
+                    </Typography>
                 </Paper>
-            </Paper>
-        </Box>
+                <Box
+                    sx={{
+                        height: '100%',
+                        maxHeight: 496,
+                        p: 2,
+                        overflow: 'auto',
+                    }}
+                    id='messages'
+                >
+                    {messagesComponent ? messagesComponent.map((component) => component) : ''}
+                </Box>
+                <Paper
+                    square
+                    elevation={0}
+                    variant="outlined"
+                    sx={{ p: '10px 10px' }}
+                >
+                    <Paper
+                        square={false}
+                        variant="outlined"
+                        sx={{ borderRadius: 5, display: 'flex' }}
+                    >
+                        <InputBase
+                            sx={{ ml: 1, pr: 2, pl: 2, width: '100%' }}
+                            placeholder="Start new conversation"
+                            inputProps={{ 'aria-label': 'Start new conversation' }}
+                            multiline
+                            maxRows={5}
+                            onKeyUp={(e) => sendMsg(e)}
+                            onKeyDown={(e) => controlNewLine(e)}
+                        />
+                    </Paper>
+                </Paper>
+            </Box>
+        </ThemeProvider>
     );
 }
 
