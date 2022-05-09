@@ -20,6 +20,8 @@ function LoginForm() {
             );
             if(res.status === 200) {
                 navigate('/');
+            } else if(res.status === 401) {
+                alert("Username or Password incorrect");
             }
         } catch(err) {
             alert(err.message);
