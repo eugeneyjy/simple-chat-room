@@ -59,7 +59,8 @@ function ChatConversationsLayout({chats, currentChat, setChats, setCurrentChat, 
     return(
         <Box
             sx={{
-                backgroundColor: grey[700],
+                backgroundColor: grey[500],
+                height: '100%',
                 minHeight: 650
             }}
         >

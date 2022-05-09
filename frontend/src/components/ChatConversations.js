@@ -8,6 +8,9 @@ function ChatConversations({ chats, currentChat, onChatClick }) {
             sx={{
                 display: 'flex',
                 flexDirection: 'column',
+                height: '100%',
+                maxHeight: 522,
+                overflow: 'auto'
             }}
         >
             <List sx={{ width: '100%', pt: 0 }}>
