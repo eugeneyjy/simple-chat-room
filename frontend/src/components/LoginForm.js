@@ -1,22 +1,30 @@
 import { Box, Button, Grid, TextField, Typography } from "@mui/material";
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 function LoginForm() {
     const [ username, setUsername ] = useState("");
     const [ password, setPassword ] = useState("");
+    const navigate = useNavigate();
 
     async function loginUser(credentials) {
-        const res = await fetch(
-            "http://localhost:8000/users/login",
-            {
-                method: 'POST',
-                body: JSON.stringify(credentials),
-                headers: { 'Content-type': 'application/json' },
-                credentials: "include"
+        try {
+            const res = await fetch(
+                "http://localhost:8000/users/login",
+                {
+                    method: 'POST',
+                    body: JSON.stringify(credentials),
+                    headers: { 'Content-type': 'application/json' },
+                    credentials: "include"
+                }
+            );
+            if(res.status === 200) {
+                navigate('/');
             }
-        );
-        const responseBody = await res.json();
-        console.log("== responseBody", responseBody);
+        } catch(err) {
+            alert(err.message);
+        }
+
     }
 
     function handleSubmit(e) {
