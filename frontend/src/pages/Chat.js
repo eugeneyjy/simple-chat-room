@@ -1,6 +1,7 @@
 import { Container, Grid } from "@mui/material";
 import Cookies from "js-cookie";
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import ChatConversationsLayout from "../components/ChatConversationsLayout";
 import ChatMessagesLayout from "../components/ChatMessagesLayout";
 import useFetchChat from "../hooks/useFetchChat";
@@ -9,6 +10,7 @@ import socket from "../utils/socket";
 
 function Chat() {
     const userId = Cookies.get('userId');
+    const navigate = useNavigate();
     const [ chats, setChats ] = useState([]);
     const [ currentChat, setCurrentChat ] = useState(0);
     const [ user ] = useFetchChats(userId, setChats);
@@ -16,6 +18,9 @@ function Chat() {
     useFetchChat(chats.length > 0 ? chats[currentChat]._id : '', setChat);
 
     useEffect(() => {
+        if(!userId) {
+            navigate('/login');
+        }
         socket.auth = { userId };
         socket.connect();
         socket.emit("addUser", userId);

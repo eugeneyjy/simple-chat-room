@@ -1,4 +1,4 @@
-import { Box, Button, Grid, TextField, Typography } from "@mui/material";
+import { Box, Button, Grid, Link, TextField, Typography } from "@mui/material";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
@@ -48,14 +48,14 @@ function LoginForm() {
             }}
         >
             <Typography component="h1" variant="h5">
-                Welcome!
+                Welcome to Whisper!
             </Typography>
             <Box 
                 component='form'
                 onSubmit={handleSubmit}
                 sx={{mt: 3}}
             >
-                <Grid container spacing={2}>
+                <Grid container spacing={2} sx={{mb: 2}}>
                     <Grid item xs={12}>
                         <TextField
                             id="username" 
@@ -74,6 +74,14 @@ function LoginForm() {
                             required
                             fullWidth
                             onChange={(e) => setPassword(e.target.value)} />
+                    </Grid>
+
+                </Grid>
+                <Grid container justifyContent="flex-end">
+                    <Grid item>
+                        <Link href="/signup">
+                            Signup
+                        </Link>
                     </Grid>
                 </Grid>
                 <Button

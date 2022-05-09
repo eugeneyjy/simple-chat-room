@@ -1,4 +1,4 @@
-import { Box, Button, Grid, TextField, Typography } from "@mui/material";
+import { Box, Button, Grid, Link, TextField, Typography } from "@mui/material";
 import { useState } from "react";
 
 function SignupForm() {
@@ -48,7 +48,7 @@ function SignupForm() {
                 onSubmit={handleSubmit}
                 sx={{mt: 3}}
             >
-                <Grid container spacing={2}>
+                <Grid container spacing={2} sx={{mb: 2}}>
                     <Grid item xs={12}>
                         <TextField
                             id="username" 
@@ -77,6 +77,13 @@ function SignupForm() {
                             required
                             fullWidth
                             onChange={(e) => setPassword(e.target.value)} />
+                    </Grid>
+                </Grid>
+                <Grid container justifyContent="flex-end">
+                    <Grid item>
+                        <Link href="/login">
+                            Login
+                        </Link>
                     </Grid>
                 </Grid>
                 <Button
