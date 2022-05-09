@@ -1,4 +1,6 @@
 # simple-chat-room
+## Frameworks
+React.js and Express.js + Socket.io
 
 ## Running Backend
 Run these docker commands in order to have mongo server running
