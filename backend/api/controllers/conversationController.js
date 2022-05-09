@@ -54,10 +54,25 @@ exports.getConversationsByUserId = async function(userId) {
             as: "otherParticipants"
           }
         },
+        { $lookup: {
+            from: "users",
+            pipeline: [
+                { $match:
+                    { $expr:
+                        { $eq: ["$_id", castedUserId] }
+                    }
+                },
+                { $project: { password: 0, email: 0 } }
+            ],
+            as: "user"
+          }
+        },
+        { $unwind: "$user" },
         { $project: {
             name: 1,
             lastMessage:{$first: "$messages"},
-            otherParticipants: 1
+            otherParticipants: 1,
+            user: 1
           }
         }
     ]);

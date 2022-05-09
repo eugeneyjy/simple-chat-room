@@ -14,3 +14,8 @@ exports.getUserByUsername = async function(username, includePassword) {
     const user = await User.findOne({username: username}, includePassword ? {} : { password: 0 });
     return user;
 }
+
+exports.getUserById = async function(userId, includePassword) {
+    const user = await User.findById(userId, includePassword ? {} : { password: 0 });
+    return user;
+}

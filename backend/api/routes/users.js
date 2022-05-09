@@ -4,7 +4,7 @@ const cors = require('cors');
 
 const { generateAuthToken, setAuthCookie, requireAuthentication, setUserIdCookie } = require('../../utils/auth');
 const { getConversationsByUserId } = require('../controllers/conversationController');
-const { createUser, getUserByUsername } = require('../controllers/userController');
+const { createUser, getUserByUsername, getUserById } = require('../controllers/userController');
 
 exports.router = router;
 
@@ -99,8 +99,9 @@ router.get('/:userId/conversations', cors(corsCredentialsOption), requireAuthent
             });
         } else {
             console.log(userId);
+            const user = await getUserById(userId, false);
             const conversations = await getConversationsByUserId(userId);
-            res.status(200).send(conversations);
+            res.status(200).send({user: user, conversations: conversations});
         }
     } catch(err) {
         console.log(err);
