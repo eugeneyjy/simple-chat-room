@@ -35,14 +35,16 @@ function ChatMessagesLayout({ userId, chat, setChats }) {
                     const responseBody = await res.json();
                     const receiverId = chat.participantIds.find((pid) => pid !== userId);
                     console.log("==receiverId", receiverId);
-                    socket.emit("sendPrivateMessage", {
+                    const socketMessage = {
                         _id: responseBody._id,
+                        chatId: chat._id,
                         senderId: userId,
                         receiverId: receiverId,
                         text: msgText,
                         timeStamp: `${timeStamp}`
-                    });
-                    setArrivalMessage(responseBody);
+                    }
+                    socket.emit("sendPrivateMessage", socketMessage);
+                    setArrivalMessage(socketMessage);
                 } else {
                     throw new Error("Failed to send message");
                 }
@@ -66,9 +68,9 @@ function ChatMessagesLayout({ userId, chat, setChats }) {
     }, []);
 
     useEffect(() => {
-        function updateChats(chats, msg) {
+        function updateChats(chats, msg, chatId) {
             return chats.map((c) => {
-                if(c._id === chat._id) {
+                if(c._id === chatId) {
                     return {...c, lastMessage: msg};
                 }
                 return c;
@@ -76,11 +78,20 @@ function ChatMessagesLayout({ userId, chat, setChats }) {
         }
 
         if(arrivalMessage) {
+            const message = {
+                _id: arrivalMessage._id,
+                senderId: arrivalMessage.senderId,
+                text: arrivalMessage.text,
+                timeStamp: arrivalMessage.timeStamp
+            };
             console.log("==arrival", arrivalMessage);
-            setChats(prev => updateChats(prev, arrivalMessage));
-            setMessages(prev => [...prev, arrivalMessage]);
+            setChats(prev => updateChats(prev, message, arrivalMessage.chatId));
+            if(chat.participantIds.includes(message.senderId)) {
+                console.log("==message", message);
+                setMessages(prev => [...prev, message]);
+            }
         }
-    }, [arrivalMessage, setChats, chat]);
+    }, [arrivalMessage, setChats]);
 
     useEffect(() => {
         if(chat) {

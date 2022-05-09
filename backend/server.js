@@ -67,15 +67,12 @@ io.on("connection", (socket) => {
         addUser(userId, socket.id);
     });
 
-    socket.on("sendPrivateMessage", ({_id, senderId, receiverId, text, timeStamp}) => {
+    socket.on("sendPrivateMessage", ({_id, chatId, senderId, receiverId, text, timeStamp}) => {
         const receiver = getUser(receiverId);
-        console.log("==receiverId", receiverId);
-        console.log("==receiver", receiver);
-        console.log("==msgId", _id);
-        console.log("==senderId", senderId);
         if(receiver) {
             io.to(receiver.socketId).emit("getPrivateMessage", {
                 _id,
+                chatId,
                 senderId,
                 text,
                 timeStamp
