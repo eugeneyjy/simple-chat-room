@@ -4,7 +4,7 @@ import ChatConversations from "./ChatConversations";
 import SearchIcon from '@mui/icons-material/Search';
 
 
-function ChatConversationsLayout({chats, setChats, setCurrentChat, user, userId}) {
+function ChatConversationsLayout({chats, currentChat, setChats, setCurrentChat, onChatClick, user, userId}) {
     async function startNewConversation(e) {
         if(e.key === 'Enter') {
             const username = e.currentTarget.value;
@@ -93,7 +93,7 @@ function ChatConversationsLayout({chats, setChats, setCurrentChat, user, userId}
                     />
                 </Paper>
             </Paper>
-            <ChatConversations chats={chats}/>
+            <ChatConversations chats={chats} currentChat={currentChat} onChatClick={onChatClick}/>
         </Box>
     );
 }

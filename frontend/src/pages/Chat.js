@@ -1,6 +1,6 @@
 import { Container, Grid } from "@mui/material";
 import Cookies from "js-cookie";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import ChatConversationsLayout from "../components/ChatConversationsLayout";
 import ChatMessagesLayout from "../components/ChatMessagesLayout";
 import useFetchChat from "../hooks/useFetchChat";
@@ -14,11 +14,22 @@ function Chat() {
     console.log("currentchat", chats[currentChat]);
     const [ chat ] = useFetchChat(chats.length > 0 ? chats[currentChat]._id : '');
 
+    function handleChatClick(idx) {
+        setCurrentChat(idx);
+    }
+
     return(
         <Container component='main' maxWidth='lg' sx={{ mt: 5, display: 'flex'}}>
             <Grid container>
                 <Grid item xs={4}>
-                    <ChatConversationsLayout chats={chats} setChats={setChats} setCurrentChat={setCurrentChat} user={user} userId={userId}/>
+                    <ChatConversationsLayout 
+                        chats={chats} 
+                        currentChat={currentChat}
+                        setChats={setChats} 
+                        setCurrentChat={setCurrentChat} 
+                        onChatClick={handleChatClick} 
+                        user={user} 
+                        userId={userId}/>
                 </Grid>
                 <Grid item xs={8}>
                     <ChatMessagesLayout userId={userId} chat={chat}/>

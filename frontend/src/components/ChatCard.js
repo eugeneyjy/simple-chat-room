@@ -1,9 +1,9 @@
 import React from "react";
 import { Avatar, ListItem, ListItemAvatar, ListItemText } from "@mui/material";
 
-function ChatCard({ info }) {
+function ChatCard({ info, selected }) {
     return(
-        <ListItem alignItems="flex-start">
+        <ListItem alignItems="flex-start" sx={selected ? { bgcolor: 'whitesmoke' } : {}}>
             <ListItemAvatar>
                 <Avatar alt="Remy Sharp" src="http://placekitten.com/200/300" />
             </ListItemAvatar>
