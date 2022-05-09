@@ -6,22 +6,20 @@ import Signup from './pages/Signup';
 
 function App() {
   return (
-    <div>
-      <Routes>
-        <Route
-          path="/"
-          element={<Chat/>}
-        />
-        <Route 
-          path="/signup"
-          element={<Signup/>}
-        />
-        <Route
-          path="/login"
-          element={<Login/>}
-        />
-      </Routes>
-    </div>
+    <Routes>
+      <Route
+        path="/"
+        element={<Chat/>}
+      />
+      <Route 
+        path="/signup"
+        element={<Signup/>}
+      />
+      <Route
+        path="/login"
+        element={<Login/>}
+      />
+    </Routes>
   );
 }
 

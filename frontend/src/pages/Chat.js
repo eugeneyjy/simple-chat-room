@@ -1,18 +1,25 @@
 import { Container, Grid } from "@mui/material";
 import Cookies from "js-cookie";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import ChatConversationsLayout from "../components/ChatConversationsLayout";
 import ChatMessagesLayout from "../components/ChatMessagesLayout";
 import useFetchChat from "../hooks/useFetchChat";
 import useFetchChats from "../hooks/useFetchChats";
+import socket from "../utils/socket";
 
 function Chat() {
     const userId = Cookies.get('userId');
     const [ chats, setChats ] = useState([]);
     const [ currentChat, setCurrentChat ] = useState(0);
     const [ user, loading, error ] = useFetchChats(userId, setChats);
-    console.log("currentchat", chats[currentChat]);
-    const [ chat ] = useFetchChat(chats.length > 0 ? chats[currentChat]._id : '');
+    const [ chat, setChat ] = useState(null);
+    useFetchChat(chats.length > 0 ? chats[currentChat]._id : '', setChat);
+
+    useEffect(() => {
+        socket.auth = { userId };
+        socket.connect();
+        socket.emit("addUser", userId);
+    }, [userId]);
 
     function handleChatClick(idx) {
         setCurrentChat(idx);
@@ -32,7 +39,9 @@ function Chat() {
                         userId={userId}/>
                 </Grid>
                 <Grid item xs={8}>
-                    <ChatMessagesLayout userId={userId} chat={chat}/>
+                    <ChatMessagesLayout
+                        userId={userId}
+                        chat={chat}/>
                 </Grid>
             </Grid>
         </Container>

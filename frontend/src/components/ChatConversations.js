@@ -3,7 +3,6 @@ import { Box } from "@mui/system";
 import ChatCard from "./ChatCard";
 
 function ChatConversations({ chats, currentChat, onChatClick }) {
-    console.log("chats", chats);
     return(
         <Box
             sx={{

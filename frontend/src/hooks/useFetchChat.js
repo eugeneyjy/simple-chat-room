@@ -1,11 +1,9 @@
-import { useState, useEffect } from 'react';
+import { useEffect } from 'react';
 
-function useFetchChat(conversationId) {
-    const [ chat, setChat ] = useState()
-
+function useFetchChat(conversationId, setChat) {
     useEffect(() => {
-        console.log(conversationId);
-        async function fetchChats() {
+        console.log("converseId", conversationId);
+        async function fetchChat() {
             let responseBody = {};
             try {
                 const response = await fetch(
@@ -26,11 +24,11 @@ function useFetchChat(conversationId) {
         }
 
         if(conversationId) {
-            fetchChats();
+            fetchChat();
         }
-    }, [ conversationId ]);
+    }, [ conversationId, setChat ]);
 
-    return [ chat ];
+    return [];
 }
 
 export default useFetchChat;

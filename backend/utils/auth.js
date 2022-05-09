@@ -31,7 +31,6 @@ exports.setUserIdCookie = function(res, userId) {
 
 exports.requireAuthentication = function(req, res, next) {
     const cookies = req.cookies;
-    console.log(cookies);
     const authToken = cookies['authToken'] || '';
 
     try {

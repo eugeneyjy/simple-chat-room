@@ -12,7 +12,8 @@ const corsCredentialsOption = {
     credentials: true
 }
 
-router.options('/', cors(corsCredentialsOption))
+router.options('/', cors(corsCredentialsOption));
+router.options('/:conversationId/messages', cors(corsCredentialsOption));
 
 
 router.post('/', cors(corsCredentialsOption), requireAuthentication, async function(req, res, next) {
@@ -36,13 +37,12 @@ router.post('/', cors(corsCredentialsOption), requireAuthentication, async funct
     }
 });
 
-router.post('/:conversationId/messages', requireAuthentication, async function(req, res, next) {
+router.post('/:conversationId/messages', cors(corsCredentialsOption), requireAuthentication, async function(req, res, next) {
     try {
         const conversationId = req.params.conversationId;
         const message = req.body;
-        const conversation = await sendMessage(req.userId, conversationId, message);
-        console.log(conversation);
-        res.status(200).send({success: "Message sent"});
+        const newMessage = await sendMessage(req.userId, conversationId, message);
+        res.status(200).send(newMessage);
     } catch(err) {
         if(err === ValidationError.SchemaError) {
             // Request body doesn't match Message schema

@@ -10,19 +10,21 @@ exports.createConversation = async function(conversation) {
 
 exports.sendMessage = async function(userId, conversationId, message) {
     const validMessage = new Message(message);
+    console.log(validMessage);
     const error = validMessage.validateSync();
     if(error) {
+        console.log(error);
         throw ValidationError.SchemaError;
     }
-    if(userId !== message.senderId) {
+    if(userId !== validMessage.senderId.toString()) {
         throw ValidationError.ForbidenActionError;
     }
     const conversation = await Conversation.findById(conversationId);
     // Make sure senderId is one of the participantId
-    if(conversation.participantIds.includes(message.senderId)) {
-        conversation.messages.push(message);
+    if(conversation.participantIds.includes(validMessage.senderId)) {
+        conversation.messages.push(validMessage);
         await conversation.save();
-        return conversation;
+        return validMessage;
     } else {
         throw ValidationError.ForbidenActionError;
     }

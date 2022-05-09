@@ -1,8 +1,83 @@
 import { Avatar, InputBase, Paper, Typography } from "@mui/material";
 import { Box } from "@mui/system";
+import moment from 'moment';
+import { useEffect, useState } from "react";
+import socket from "../utils/socket";
 
 function ChatMessagesLayout({ userId, chat }) {
-    console.log("filter", chat ? chat.participants.filter(p => p._id !== userId)[0] : '');
+    const [ arrivalMessage, setArrivalMessage ] = useState(null);
+    const [ messages, setMessages ] = useState(null);
+    console.log("==chat", chat);
+
+    async function sendMsg(e) {
+        if(e.key === 'Enter' && !e.shiftKey && e.currentTarget.value) {
+            e.preventDefault();
+            const msgText = e.currentTarget.value;
+            e.currentTarget.value = '';
+            const timeStamp = moment().format();
+            const message = {
+                senderId: userId,
+                text: msgText,
+                timeStamp: `${timeStamp}`
+            }
+            console.log(JSON.stringify(message));
+            try {
+                const res = await fetch(
+                    `http://localhost:8000/conversations/${chat._id}/messages`,
+                    {
+                        method: 'POST',
+                        body: JSON.stringify(message),
+                        headers: { 'Content-type': 'application/json' },
+                        credentials: 'include'
+                    }
+                );
+                if(res.status === 200) {
+                    const responseBody = await res.json();
+                    const receiverId = chat.participantIds.find((pid) => pid !== userId);
+                    console.log("==receiverId", receiverId);
+                    socket.emit("sendPrivateMessage", {
+                        _id: responseBody._id,
+                        senderId: userId,
+                        receiverId: receiverId,
+                        text: msgText,
+                        timeStamp: `${timeStamp}`
+                    });
+                    setArrivalMessage(responseBody);
+                } else {
+                    throw new Error("Failed to send message");
+                }
+            } catch(err) {
+                console.log(err);
+                alert(err);
+            }
+        }
+    }
+
+    function controlNewLine(e) {
+        if(e.key === 'Enter' && !e.shiftKey) {
+            e.preventDefault();
+        }
+    }
+
+    useEffect(() => {
+        socket.on("getPrivateMessage", data => {
+            setArrivalMessage(data);
+        });
+    }, []);
+
+    useEffect(() => {
+        if(arrivalMessage) {
+            console.log("==arrival", arrivalMessage);
+            setMessages(prev => [...prev, arrivalMessage]);
+        }
+    }, [arrivalMessage]);
+
+    useEffect(() => {
+        if(chat) {
+            setMessages(chat.messages);
+        }
+    }, [chat]);
+
     return(
         <Box
             sx={{ 
@@ -26,7 +101,7 @@ function ChatMessagesLayout({ userId, chat }) {
             <Box
                 sx={{height: '100%'}}
             >
-                {chat ? chat.messages.map((message) => (<div key={message._id}>{message.text}</div>)) : ''}
+                {messages ? messages.map((message) => (<div key={message._id}>{message.text}</div>)) : ''}
             </Box>
             <Paper
                 square
@@ -45,6 +120,8 @@ function ChatMessagesLayout({ userId, chat }) {
                         inputProps={{ 'aria-label': 'Start new conversation' }}
                         multiline
                         maxRows={5}
+                        onKeyUp={(e) => sendMsg(e)}
+                        onKeyDown={(e) => controlNewLine(e)}
                     />
                 </Paper>
             </Paper>
