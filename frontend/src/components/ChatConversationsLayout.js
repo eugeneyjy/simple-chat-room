@@ -5,6 +5,7 @@ import SearchIcon from '@mui/icons-material/Search';
 
 
 function ChatConversationsLayout({chats, currentChat, setChats, setCurrentChat, onChatClick, user, userId}) {
+    console.log("==chats", chats);
     async function startNewConversation(e) {
         if(e.key === 'Enter') {
             const username = e.currentTarget.value;
@@ -69,7 +70,7 @@ function ChatConversationsLayout({chats, currentChat, setChats, setCurrentChat, 
                 variant="outlined"
                 sx={{ p: '12px 10px', display: 'flex', alignItems: 'center', width: 400 }}
             >
-                <Avatar alt="Remy Sharp" src="http://placekitten.com/200/300" sx={{ mr: 2, ml: 0.5 }}/>
+                <Avatar alt="Remy Sharp" src={user.icon} sx={{ mr: 2, ml: 0.5 }}/>
                 <Typography variant="h6" color="inherit" component="div">
                     {user.username ? user.username : ''}
                 </Typography>

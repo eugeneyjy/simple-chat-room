@@ -79,30 +79,39 @@ function ChatMessagesLayout({ userId, chat, setChats }) {
         }
 
         function updateMessagesComponent(components, msg) {
-            let lastMsgGroup = components[components.length-1];
-            if(lastMsgGroup.props.side === 'right') {
-                if(msg.senderId === userId) {
-                    // let newComponents = [...components];
-                    lastMsgGroup.props.messages.push(msg.text);
-                    return [...components];
+            if(components && components.length > 0) {
+                let lastMsgGroup = components[components.length-1];
+                if(lastMsgGroup.props.side === 'right') {
+                    if(msg.senderId === userId) {
+                        // let newComponents = [...components];
+                        lastMsgGroup.props.messages.push(msg.text);
+                        return [...components];
+                    } else {
+                        console.log("push2");
+                        return [...components, <ChatMessages avatar={chat.participants.filter(p => p._id !== userId)[0].icon} key={msg._id} side={'left'} messages={[msg.text]}/>];
+                    }
                 } else {
-                    console.log("push2");
-                    return [...components, <ChatMessages key={msg._id} side={'left'} messages={[msg.text]}/>];
+                    if(msg.senderId !== userId) {
+                        // let newComponents = [...components];
+                        lastMsgGroup.props.messages.push(msg.text);
+                        return [...components];
+                    } else {
+                        console.log("push4");
+                        return [...components, <ChatMessages key={msg._id} side={'right'} messages={[msg.text]}/>];
+                    }
                 }
             } else {
-                if(msg.senderId !== userId) {
-                    // let newComponents = [...components];
-                    lastMsgGroup.props.messages.push(msg.text);
-                    return [...components];
-                } else {
-                    console.log("push4");
+                if(msg.senderId === userId) {
                     return [...components, <ChatMessages key={msg._id} side={'right'} messages={[msg.text]}/>];
+                } else {
+                    return [...components, <ChatMessages avatar={chat.participants.filter(p => p._id !== userId)[0].icon} key={msg._id} side={'left'} messages={[msg.text]}/>];
                 }
             }
         }
 
         if(arrivalMessage) {
-            console.log("arrive");
+            console.log("==chat",chat);
+            console.log("==arrivalMessage", arrivalMessage);
             const message = {
                 _id: arrivalMessage._id,
                 senderId: arrivalMessage.senderId,
@@ -110,7 +119,7 @@ function ChatMessagesLayout({ userId, chat, setChats }) {
                 timeStamp: arrivalMessage.timeStamp
             };
             setChats(prev => updateChats(prev, message, arrivalMessage.chatId));
-            if(chat.participantIds.includes(message.senderId)) {
+            if(chat && chat.participantIds.includes(message.senderId)) {
                 console.log("outside");
                 const updatedMessagesComponent = updateMessagesComponent(messagesComponent, message);
                 setMessagesComponent(updatedMessagesComponent);
@@ -145,6 +154,7 @@ function ChatMessagesLayout({ userId, chat, setChats }) {
                         } else {
                             components.push(
                                 <ChatMessages
+                                    avatar={chat.participants.filter(p => p._id !== userId)[0].icon}
                                     key={message._id}
                                     side={'left'}
                                     messages={[message.text]}
@@ -164,6 +174,7 @@ function ChatMessagesLayout({ userId, chat, setChats }) {
                     } else {
                         components.push(
                             <ChatMessages
+                                avatar={chat.participants.filter(p => p._id !== userId)[0].icon}
                                 key={message._id}
                                 side={'left'}
                                 messages={[message.text]}
@@ -205,7 +216,7 @@ function ChatMessagesLayout({ userId, chat, setChats }) {
                     variant="outlined"
                     sx={{ p: '12px 10px', display: 'flex', alignItems: 'center' }}
                 >
-                    <Avatar alt="Remy Sharp" src="http://placekitten.com/200/300" sx={{ mr: 2 }}/>
+                    <Avatar alt="Remy Sharp" src={chat ? chat.participants.filter(p => p._id !== userId)[0].icon : ''} sx={{ mr: 2 }}/>
                     <Typography variant="h6" color="inherit" component="div">
                         {chat ? chat.participants.filter(p => p._id !== userId)[0].username : ''}
                     </Typography>
