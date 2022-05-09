@@ -9,6 +9,8 @@ const messageSchema = new Schema({
 
 const conversationSchema = new Schema({
     participantIds: { type: [mongoose.Types.ObjectId], validate: v => Array.isArray(v) && v.length >= 2 },
+    type: { type: String, required: true },
+    name: { type: String },
     messages: [messageSchema]
 }, { versionKey: false });
 

@@ -3,6 +3,7 @@ const bcrypt = require('bcryptjs');
 const cors = require('cors');
 
 const { generateAuthToken, setAuthCookie, requireAuthentication } = require('../../utils/auth');
+const { getConversationsByUserId } = require('../controllers/conversationController');
 const { createUser, getUserByUsername } = require('../controllers/userController');
 
 exports.router = router;
@@ -88,12 +89,20 @@ router.post('/login', cors(corsCredentialsOption), async function(req, res, next
     }
 });
 
-// router.get('/:userId/messages', requireAuthentication, async function(req, res, next) {
-//     if(req.user !== req.params.userId) {
-//         res.status(403).json({
-//             error: "Unauthorized to access the specified resource"
-//         });
-//     } else {
-//         res.status(200).send({Success: 'congrats'});
-//     }
-// });
+router.get('/:userId/conversations', requireAuthentication, async function(req, res, next) {
+    try {
+        const userId = req.params.userId;
+        if(req.userId !== userId) {
+            res.status(403).json({
+                error: "Unauthorized to access the specified resource"
+            });
+        } else {
+            console.log(userId);
+            const conversations = await getConversationsByUserId(userId);
+            res.status(200).send(conversations);
+        }
+    } catch(err) {
+        console.log(err);
+        next();
+    }
+});
