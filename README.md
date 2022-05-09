@@ -7,22 +7,11 @@ docker network create --driver bridge mongo-net
 ```
 
 ```
-docker run -d --name mongo-server
-  --network mongo-net
-  -p "27017:27017"
-  -e "MONGO_INITDB_ROOT_USERNAME=root"
-  -e "MONGO_INITDB_ROOT_PASSWORD=hunter2"
-  mongo:latest
+docker run -d --name mongo-server --network mongo-net -p "27017:27017" -e "MONGO_INITDB_ROOT_USERNAME=root" -e "MONGO_INITDB_ROOT_PASSWORD=hunter2" mongo:latest
 ```
 
 ```
-docker run --rm -it
-	--network mongo-net
-	mongo:latest
-	mongo --host mongo-server
-		--username root
-		--password hunter2
-		--authenticationDatabase admin
+docker run --rm -it --network mongo-net mongo:latest mongo --host mongo-server --username root --password hunter2 --authenticationDatabase admin
 ```
 Inside mongo-shell, run these command to create database and user
 ```
