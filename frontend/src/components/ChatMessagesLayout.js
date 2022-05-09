@@ -4,7 +4,7 @@ import moment from 'moment';
 import { useEffect, useState } from "react";
 import socket from "../utils/socket";
 
-function ChatMessagesLayout({ userId, chat }) {
+function ChatMessagesLayout({ userId, chat, setChats }) {
     const [ arrivalMessage, setArrivalMessage ] = useState(null);
     const [ messages, setMessages ] = useState(null);
     console.log("==chat", chat);
@@ -66,11 +66,21 @@ function ChatMessagesLayout({ userId, chat }) {
     }, []);
 
     useEffect(() => {
+        function updateChats(chats, msg) {
+            return chats.map((c) => {
+                if(c._id === chat._id) {
+                    return {...c, lastMessage: msg};
+                }
+                return c;
+            });
+        }
+
         if(arrivalMessage) {
             console.log("==arrival", arrivalMessage);
+            setChats(prev => updateChats(prev, arrivalMessage));
             setMessages(prev => [...prev, arrivalMessage]);
         }
-    }, [arrivalMessage]);
+    }, [arrivalMessage, setChats, chat]);
 
     useEffect(() => {
         if(chat) {

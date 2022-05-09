@@ -11,7 +11,7 @@ function Chat() {
     const userId = Cookies.get('userId');
     const [ chats, setChats ] = useState([]);
     const [ currentChat, setCurrentChat ] = useState(0);
-    const [ user, loading, error ] = useFetchChats(userId, setChats);
+    const [ user ] = useFetchChats(userId, setChats);
     const [ chat, setChat ] = useState(null);
     useFetchChat(chats.length > 0 ? chats[currentChat]._id : '', setChat);
 
@@ -41,7 +41,8 @@ function Chat() {
                 <Grid item xs={8}>
                     <ChatMessagesLayout
                         userId={userId}
-                        chat={chat}/>
+                        chat={chat}
+                        setChats={setChats}/>
                 </Grid>
             </Grid>
         </Container>
