@@ -18,8 +18,20 @@ exports.setAuthCookie = function(res, token) {
     );
 }
 
+exports.setUserIdCookie = function(res, userId) {
+    res.cookie('userId', userId,
+        {
+            expires: new Date(Date.now() + 12 * 3600000), // Cookie will expire in 12 hours
+            path: '/',
+            secure: true,
+            sameSite: 'strict'
+        }
+    );
+}
+
 exports.requireAuthentication = function(req, res, next) {
     const cookies = req.cookies;
+    console.log(cookies);
     const authToken = cookies['authToken'] || '';
 
     try {

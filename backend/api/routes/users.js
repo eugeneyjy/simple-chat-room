@@ -2,7 +2,7 @@ const router = require('express').Router();
 const bcrypt = require('bcryptjs');
 const cors = require('cors');
 
-const { generateAuthToken, setAuthCookie, requireAuthentication } = require('../../utils/auth');
+const { generateAuthToken, setAuthCookie, requireAuthentication, setUserIdCookie } = require('../../utils/auth');
 const { getConversationsByUserId } = require('../controllers/conversationController');
 const { createUser, getUserByUsername } = require('../controllers/userController');
 
@@ -75,6 +75,7 @@ router.post('/login', cors(corsCredentialsOption), async function(req, res, next
                 const authToken = generateAuthToken(user._id);
                 // set authentication token in cookies
                 setAuthCookie(res, authToken);
+                setUserIdCookie(res, user._id.toString());
                 res.status(200).send({});
             // Return error when user entered wrong password
             } else {
@@ -89,7 +90,7 @@ router.post('/login', cors(corsCredentialsOption), async function(req, res, next
     }
 });
 
-router.get('/:userId/conversations', requireAuthentication, async function(req, res, next) {
+router.get('/:userId/conversations', cors(corsCredentialsOption), requireAuthentication, async function(req, res, next) {
     try {
         const userId = req.params.userId;
         if(req.userId !== userId) {
