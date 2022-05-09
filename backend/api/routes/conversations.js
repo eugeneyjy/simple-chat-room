@@ -1,12 +1,21 @@
 const router = require('express').Router();
+const cors = require('cors');
 
 const { requireAuthentication } = require('../../utils/auth');
 const { ValidationError } = require('../../utils/validation');
-const { createConversation, sendMessage } = require('../controllers/conversationController');
+const { createConversation, sendMessage, getConversationById } = require('../controllers/conversationController');
 
 exports.router = router;
 
-router.post('/', requireAuthentication, async function(req, res, next) {
+const corsCredentialsOption = {
+    origin:'http://localhost:3000',
+    credentials: true
+}
+
+router.options('/', cors(corsCredentialsOption))
+
+
+router.post('/', cors(corsCredentialsOption), requireAuthentication, async function(req, res, next) {
     try {
         const conversation = req.body;
         const newConversation = await createConversation(conversation);
@@ -50,5 +59,20 @@ router.post('/:conversationId/messages', requireAuthentication, async function(r
             console.log(err);
             next();
         }
+    }
+});
+
+router.get('/:conversationId', cors(corsCredentialsOption), requireAuthentication, async function(req, res, next) {
+    try {
+        const id = req.params.conversationId;
+        const conversation = await getConversationById(id);
+        if(conversation.length > 0) {
+            res.status(200).send(conversation[0]);
+        } else {
+            next();
+        }
+    } catch(err) {
+        console.log(err);
+        next();
     }
 });

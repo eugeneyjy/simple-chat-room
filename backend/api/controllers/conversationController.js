@@ -54,27 +54,32 @@ exports.getConversationsByUserId = async function(userId) {
             as: "otherParticipants"
           }
         },
-        { $lookup: {
-            from: "users",
-            pipeline: [
-                { $match:
-                    { $expr:
-                        { $eq: ["$_id", castedUserId] }
-                    }
-                },
-                { $project: { password: 0, email: 0 } }
-            ],
-            as: "user"
-          }
-        },
-        { $unwind: "$user" },
         { $project: {
             name: 1,
-            lastMessage:{$first: "$messages"},
+            lastMessage:{$last: "$messages"},
             otherParticipants: 1,
-            user: 1
           }
         }
     ]);
     return conversations;
+}
+
+exports.getConversationById = async function(id) {
+    const conversation = await Conversation.aggregate([
+        { $match: {
+            _id: new mongoose.Types.ObjectId(id)
+          }
+        },
+        { $lookup: {
+            from: "users",
+            localField: "participantIds",
+            foreignField: "_id",
+            pipeline: [
+                { $project: { password: 0 } }
+            ],
+            as: "participants"
+          }
+        }
+    ]);
+    return conversation;
 }

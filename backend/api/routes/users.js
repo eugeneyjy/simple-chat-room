@@ -90,6 +90,21 @@ router.post('/login', cors(corsCredentialsOption), async function(req, res, next
     }
 });
 
+router.get('/byusername/:username', async function(req, res, next) {
+    try {
+        const username = req.params.username;
+        const user = await getUserByUsername(username, false);
+        if(user) {
+            res.status(200).send(user);
+        } else {
+            next();
+        }
+    } catch(err) {
+        console.log(err);
+        next();
+    }
+});
+
 router.get('/:userId/conversations', cors(corsCredentialsOption), requireAuthentication, async function(req, res, next) {
     try {
         const userId = req.params.userId;
