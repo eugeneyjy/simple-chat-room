@@ -3,7 +3,7 @@
 ## Running Backend
 Run these docker commands in order to have mongo server running
 ```
-docker network create --driver bridge book-a-place-net
+docker network create --driver bridge mongo-net
 ```
 
 ```
